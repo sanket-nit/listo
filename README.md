@@ -1,36 +1,143 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Listo 📝
 
-## Getting Started
+**Listo** is a modern, fullstack ToDo app built with **Next.js**, **Prisma**, **Supabase (PostgreSQL)**, **NextAuth.js**, and **Tailwind CSS**.  
+It lets you securely register, log in, and manage your personal tasks — with beautiful UI components powered by **shadcn/ui**.
 
-First, run the development server:
+---
+
+## ✨ Features
+
+✅ Next.js App Router (`app/`)  
+✅ Fully typed PostgreSQL database (Supabase) via Prisma ORM  
+✅ Secure authentication with `next-auth` and hashed passwords  
+✅ Social login support (Google, GitHub, etc.)  
+✅ Protected API routes  
+✅ CRUD operations for ToDos, scoped per user  
+✅ Modern, accessible UI with `shadcn/ui` and Tailwind CSS  
+✅ Deployed easily on **Vercel**
+
+---
+
+## 🗂️ Tech Stack
+
+- **Framework:** Next.js 14+ (App Router)
+- **Auth:** next-auth with Prisma Adapter
+- **ORM:** Prisma
+- **Database:** Supabase Postgres
+- **Styling:** Tailwind CSS + shadcn/ui components
+- **Deployment:** Vercel
+
+---
+
+## ⚙️ Local Setup
+
+### 1️⃣ Clone the repo
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/listo.git
+cd listo
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2️⃣ Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3️⃣ Set up .env
 
-## Learn More
+Create a `.env` file and add:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+# Supabase Postgres connection
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# NextAuth secret
+NEXTAUTH_SECRET="YOUR_RANDOM_SECRET"
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Social OAuth keys (optional)
+GOOGLE_ID="your_google_client_id"
+GOOGLE_SECRET="your_google_client_secret"
+```
 
-## Deploy on Vercel
+💡 **Tip:** Use `openssl rand -base64 32` to generate a secure `NEXTAUTH_SECRET`.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### 4️⃣ Generate DB & Prisma client
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npx prisma migrate dev --name init
+npx prisma generate
+```
+
+### 5️⃣ Run the dev server
+
+```bash
+pnpm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000)
+
+---
+
+## ✅ How Auth Works
+
+- **Register:** `/api/auth/register` → hashes password with bcrypt → stores in Supabase Postgres
+- **Login:** next-auth CredentialsProvider → verifies with hashed password
+- **Social login:** Add Google, GitHub providers easily
+- **Sessions:** Stored as JWTs, managed by next-auth
+- **Protected routes:** Use `getServerSession` or `<SessionProvider>`
+
+---
+
+## 🗃️ Database Schema (Prisma)
+
+```prisma
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  email     String   @unique
+  password  String?  // hashed with bcrypt
+  todos     Todo[]
+  createdAt DateTime @default(now())
+}
+
+model Todo {
+  id        String   @id @default(cuid())
+  title     String
+  isDone    Boolean  @default(false)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+}
+```
+
+---
+
+## 🚀 Deploy to Production
+
+1. Push to GitHub
+2. Connect your repo to Vercel
+3. Add your `DATABASE_URL` and `NEXTAUTH_SECRET` in Vercel Project Settings → Environment Variables
+4. Trigger redeploy
+5. Enjoy your live Listo app!
+
+---
+
+## ❤️ Credits
+
+Built with:
+
+- [Next.js](https://nextjs.org/)
+- [Prisma](https://prisma.io/)
+- [Supabase](https://supabase.com/)
+- [next-auth](https://next-auth.js.org/)
+- [shadcn/ui](https://ui.shadcn.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+
+---
+
+## 📃 License
+
+MIT — free to use, free to modify.
+
+Happy building! 🫶
